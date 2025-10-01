@@ -1,3 +1,42 @@
+## What is API ?
+
+APIs are mechanisms that allow different software applications ( such as frontend and backend ) to communicate with each other. They define a set of rules and protocols( HTTP, REST, GraphQL, etc. ) for how data should be exchanged between systems, enabling them to work together seamlessly. APIs can be used for various purposes, such as accessing data from a web service, integrating with third-party applications, or building complex software systems.
+
+```bash
++-----------------+                    +-----------------+
+|   Frontend      | >-- Request--->    |    Backend      |
++-----------------+                    +-----------------+
+|  User Interface | <--- Response---<  |  API Endpoints  |
++-----------------+      API           +-----------------+
+```
+```bash
+Analogy
+
++-----------------+                    +-----------------+
+|   Restaurant    | >-- Order--->      |    Kitchen      |
++-----------------+                    +-----------------+
+|  Customer       | <--- Food--------< |  Chef           |
++-----------------+     Waiter         +-----------------+
+``` 
+
+## why API needed ?
+> lets talk about pre-API era ..
+
+Before APIs, software applications were often built as monolithic systems, where all components were tightly integrated and interdependent. This made it difficult to update or modify individual parts of the system without affecting the entire application. Additionally, integrating with third-party services or accessing external data sources was often a complex and time-consuming process.
+
+> Problems with monolithic systems:
+1. **Tight Coupling**: Components within a monolithic application are tightly coupled, making it difficult to change or update one part without affecting others.
+2. **Scalability Issues**: Scaling a monolithic application can be challenging, as the entire application must be scaled together, even if only one component requires additional resources.
+3. **Limited Flexibility**: Monolithic systems often lack the flexibility to integrate with new technologies or services, making it difficult to adapt to changing business needs.
+4. **Slower Development Cycles**: The complexity of monolithic systems can lead to longer development cycles, as changes must be carefully coordinated and tested across the entire application.
+5. **Difficult Maintenance**: Maintaining and updating a monolithic application can be cumbersome, as even small changes may require extensive testing and deployment processes.
+
+Now lets take IRCTC as an example which uses monolithic architecture , but now many other ticket booking platforms like MakemyTrip, Yatra, Goibibo wants to know the trains between two stations so they can provide the same service to their users. So how can they do that ?
+> Solution : IRCTC has to somehow provide access of their database where the information of trains between those two stations is stored . But this is not possible as it can lead to security issues and also IRCTC will not want to share their database with other platforms. So the solution to this problem is API. IRCTC can create an API which will provide the information of trains between two stations and other platforms can use this API to get the required information without having access to the database.
+
+For this IRCTC has to decoupled thier monolithic architecture , they developed a separate backend service which will handle all the requests from other platforms and provide the required information. This backend service is called API service. Now other platforms can send requests to this API service and get the required information without having access to the database.
+
+
 ## Why FastAPI 
 FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints. Here are some reasons why FastAPI is a great choice for building web applications and APIs:
 1. **High Performance**: FastAPI is one of the fastest Python web frameworks available, thanks to its use of asynchronous programming and the Starlette framework. It can handle a large number of requests per second, making it suitable for high-performance applications.
