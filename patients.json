@@ -1,0 +1,15 @@
+{
+"P001": {"name":"A", "age": 34,"gender": "M", "height": 5.7, "weight": 70, "bp": 120, "cholesterol": 180 },
+"P002": {"name":"B", "age": 28,"gender": "F", "height": 5.4, "weight": 60, "bp": 110, "cholesterol": 170 },
+"P003": {"name":"C", "age": 45,"gender": "M", "height": 5.9, "weight": 80, "bp": 130, "cholesterol": 190 }, 
+"P004": {"name":"D", "age": 50,"gender": "F", "height": 5.5, "weight": 65, "bp": 140, "cholesterol": 200 },
+"P005": {"name":"E", "age": 38,"gender": "M", "height": 6.0, "weight": 90, "bp": 125, "cholesterol": 185 },
+"P006": {"name":"F", "age": 29,"gender": "F", "height": 5.6, "weight": 55, "bp": 115, "cholesterol": 175 },
+"P007": {"name":"G", "age": 41,"gender": "M", "height": 5.8, "weight": 75, "bp": 135, "cholesterol": 195 },
+"P008": {"name":"H", "age": 33,"gender": "F", "height": 5.3, "weight": 50, "bp": 105, "cholesterol": 165 },
+"P009": {"name":"I", "age": 47,"gender": "M", "height": 6.1, "weight": 85, "bp": 145, "cholesterol": 205 },
+"P010": {"name":"J", "age": 36,"gender": "F", "height": 5.7, "weight": 68, "bp": 118, "cholesterol": 178 } ,
+"P011": {"name":"K", "age": 31,"gender": "M", "height": 5.9, "weight": 72, "bp": 122, "cholesterol": 182 },
+"P012": {"name":"L", "age": 27,"gender": "F", "height": 5.4, "weight": 58, "bp": 112, "cholesterol": 172 },
+"P013": {"name":"M", "age": 40,"gender": "M", "height": 5.8, "weight": 80, "bp": 130, "cholesterol": 180 }
+}
