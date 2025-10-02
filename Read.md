@@ -37,6 +37,11 @@ Now lets take IRCTC as an example which uses monolithic architecture , but now m
 For this IRCTC has to decoupled thier monolithic architecture , they developed a separate backend service which will handle all the requests from other platforms and provide the required information. This backend service is called API service. Now other platforms can send requests to this API service and get the required information without having access to the database.
 
 
+# API - ML Perspective
+In the context of Machine Learning (ML), APIs play a crucial role in deploying and serving ML models. Once a machine learning model is trained and validated, it needs to be integrated into applications or services so that it can be used to make predictions on new data. This is where APIs come into play.
+APIs provide a standardized way for applications to interact with the ML model, allowing them to send input data and receive predictions in return. This enables seamless integration of ML models into various applications, such as web apps, mobile apps, or other backend services.
+
+
 ## Why FastAPI 
 FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints. Here are some reasons why FastAPI is a great choice for building web applications and APIs:
 1. **High Performance**: FastAPI is one of the fastest Python web frameworks available, thanks to its use of asynchronous programming and the Starlette framework. It can handle a large number of requests per second, making it suitable for high-performance applications.
@@ -53,3 +58,111 @@ FastAPI is a modern, fast (high-performance), web framework for building APIs wi
 
 
 ## Fundamentals of FastAPI 
+FastAPI is built upon two famous Python libraries: Starlette and Pydantic.
+1. **Starlette**: Starlette is a lightweight ASGI (Asynchronous Server Gateway Interface) framework that provides the core functionality for building web applications and APIs. It handles routing, middleware, request/response handling, and other essential web features. FastAPI leverages Starlette's capabilities to provide a high-performance and asynchronous web framework.
+2. **Pydantic**: Pydantic is a data validation and settings management library that uses Python type annotations. It allows developers to define data models with type hints, and it automatically validates and serializes data based on these models. FastAPI uses Pydantic to handle request and response data validation, ensuring that the data being processed is in the expected format.
+
+
+## Philosophy of FastAPI
+>> what was missing in other frameworks ? 
+- **performance** : Other frameworks like Flask and Django are synchronous in nature, which can lead to performance bottlenecks when handling a large number of concurrent requests. 
+- **unnecessary boilerplate code** : Other frameworks often require a lot of boilerplate code to set up routes, handle requests, and validate data. This can lead to longer development times and increased complexity.
+
+>> What FastAPI offers ?
+
+- **Fast to Run** : FastAPI is designed to be fast to run, with minimal overhead. This makes it suitable for building high-performance applications that require low latency and high throughput.
+- **Fast to Code** : FastAPI is designed to be easy to use and learn, with a simple and intuitive syntax. This allows developers to quickly create APIs with minimal boilerplate code, reducing development time and complexity.
+
+
+### Why FastAPI is fast to Run ?
+
+>> Scenario :
+
+``` bash
+
++------------+
+|  Client    |
++------------+
+      |
+      |  interacts             
+      |                                
+      |                         
+      |                        
+      |                         content-length: 12       
+      v
++------------------+
+|  Web Server      |        
++------------------+
+      |                       the request is a HTTP request , which looks something like this
+      |                         GET /items/ HTTP/1.1
+      |                         Host: example.com
+      |                         Content-Type: application/json 
+      |  Request                Content-Length: 12
+      |                         { "item_id": 123 }    
+      v
++------------+
+|  SGI       |              Now the server gateway interface (SGI ) converts the HTTP request into a Python dictionary so that
+|            |             our python code can understand it.
++------------+             this looks something like this :
+      |
+      |                        Request.method = "GET"
+      |                        Request.url = ".../items/"
+      |                        Request.headers = { "Content-Type": "application/json", ... }
+      |                        Request.json = { "item_id": 123 }
+      |
+      |
+      v
++------------------+
+|  API code        |          Now FastAPI takes this dictionary and maps it to the appropriate   API endpoint and function.
++------------------+         It also validates the input data using Pydantic models, ensuring that the data is in the expected
+      |                       format.
+      |
+      |
+      |                        def get_item(item_id: int):
+      |                            # process the request
+      |                            return { "item_id": item_id, "name": "Item Name" }
+      |
+      v
++------------+
+|  SGI       |              After processing the request, the API code returns a response dictionary, which looks something like
+|            |             this :
+|            |             Response.status_code = 200
+|            |             Response.headers = { "Content-Type": "application/json", ... }
+|            |             Response.json = { "item_id": 123, "name": "Item Name" }
++------------+
+      |
+      |                        The SGI then converts this response dictionary back into an HTTP response format that can be sent
+      |                        back to  the client.
+      |
+      v 
++------------------+
+|  Web Server      |          This looks something like this :
++------------------+         HTTP/1.1 200 OK
+      |                       Content-Type: application/json
+      |                       Content-Length: 34
+      |                       
+      |                       { "item_id": 123, "name": "Item Name" }
+      |
+      v 
++------------+
+|  Client    |              Finally, the web server sends the HTTP response back to the client
++------------+
+```
+
+
+
+### comparing with Flask
+
+- **Flask** has the same flow as above but the SGI used by Flask is WSGI (Web Server Gateway Interface) which is synchronous in nature. This means that it can only handle one request at a time, which can lead to performance bottlenecks when handling a large number of concurrent requests. This is because WSGI uses a thread-based model, where each request is handled by a separate thread. When a thread is blocked (for example, waiting for a database query to complete), it cannot handle any other requests until it is unblocked. This can lead to a situation where many threads are blocked, causing the server to become unresponsive.
+    - Flask uses `werkzeug` library for WSGI implementation. It uses `Gunicorn` or `uWSGI` as the production server.
+
+- **FastAPI** uses ASGI (Asynchronous Server Gateway Interface) which is asynchronous in nature. This means that it can handle multiple requests concurrently, even when some of them are blocked. This is because ASGI uses an event loop model, where a single thread can handle multiple requests by switching between them when they are blocked. This allows the server to remain responsive even when handling a large number of concurrent requests.
+    - FastAPI uses the `Starlette` library for ASGI implementation. It uses `Uvicorn` or Hypercorn as the production server.      
+    - FastAPI supports asynchronous programming using `async` and `await` keywords, allowing developers to write non-blocking code that can handle multiple requests concurrently. This is particularly useful for I/O-bound operations such as database queries and external API calls.
+
+
+### Why FastAPI is fast to Code ?
+- **Automatic Data Validation** : FastAPI uses `Pydantic` models to automatically validate and serialize request and response data based on Python type hints. This means that developers do not have to write custom validation code, reducing boilerplate and potential errors.    
+- **Automatic Interactive Documentation** : FastAPI **automatically** generates **interactive** API documentation using `Swagger UI` and `Redoc`. This allows developers to explore and test API endpoints without having to write separate documentation or testing code.
+- **Dependency Injection** : FastAPI has a built-in dependency injection system that makes it easy to manage and reuse components such as database connections, authentication, and other services. This reduces boilerplate code and improves code organization.
+- **Seamless Integration** : It seamlessly integrated with modern Ecosystem like ML/DL libraries ( TensorFlow, PyTorch, Scikit-learn ), OAuth2, JWT authentication, databases ( SQLAlchemy, Tortoise-ORM ), Docker , Kuberneres and more .  This allows developers to quickly add functionality to their applications without having to write custom integration code.
