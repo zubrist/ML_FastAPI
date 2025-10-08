@@ -57,3 +57,7 @@ You can use the `Query()` function to set properties such as:
 - Min and max values    ( Set minimum and maximum values for numeric parameters)
 - Regex                 ( Validate string parameters against regex patterns)
 - Examples              ( Provide example values for query parameters)
+
+
+
+
