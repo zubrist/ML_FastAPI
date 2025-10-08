@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator, EmailStr
+from pydantic import BaseModel, Field, field_validator, EmailStr , model_validator , computed_field
 from typing import List, Dict, Annotated
 
 
@@ -109,6 +109,8 @@ Field Validator
 
 When we need to do some custom validation that is not covered by the built-in validators, we can use the @validator decorator.
 for example , we want to check if the email has hdfc.com/icici.com domain
+
+
 '''
 
 class PatientValidator(BaseModel):
@@ -141,4 +143,134 @@ print(patient_validator)
 field validator works on two modees : before and after
 by default it works in after mode , which means the validation is done after the built-in validation is done.
 if we want to do the validation before the built-in validation, we can use mode='before' in the decorator 
+
+import field_validator from pydantic
 '''
+
+
+'''
+model validator
+
+suppose we want to validate two fields together , for example we want to check if the age is greater than 18 if the patient is married
+
+'''
+
+class PatientModelValidator(BaseModel):
+    name: str = Field(..., description="Name of the patient", example="John Doe")
+    age: int = Field(..., gt=0, lt=120, description="Age must be between 0 and 120", example=30)
+    married: bool = Field(..., description="Marital status of the patient", example=False)
+    contact_details: Dict[str,str] = Field(..., description="Contact details of the patient", example={"email":"john.doe@example.com", "phone":"1234567890"})
+
+    @model_validator(mode='after') # we dont need to specify the field name here as we are validating multiple fields together
+    @classmethod
+    def check_age_if_married(cls, model):
+        age = model.age
+        married = model.married
+
+        if married and age < 18:
+            raise ValueError("Age must be greater than 18 if the patient is married")
+
+
+        
+        return model
+    
+    @model_validator(mode='after')
+    @classmethod
+    def validate_emergency_contact(cls,model):
+
+        if model.age > 60 and 'emergency_contact' not in model.contact_details:
+            raise ValueError("Emergency contact is required for patients above 60 years old")
+        return model
+    
+
+ # lets test the model validator
+#patient_model_validator_info= {"name":"Zubrist", "age":65, "married": True, "contact_details":{"email":"zubrist@gmail.com", "phone":"1234567890"}} # this will raise a validation error because age is less than 18 and married is True
+patient_model_validator_info= {"name":"Zubrist", "age":25, "married": True, "contact_details":{"email":"zubrist@gmail.com", "phone":"1234567890", "emergency_contact":"9876543210"}}
+patient_model_validator= PatientModelValidator(**patient_model_validator_info)
+print(patient_model_validator)
+
+
+
+
+'''
+computed Field 
+sometimes we want to compute a field based on other fields , for example we want to compute the bmi based on weight and height
+ for that we need to import computed_field from pydantic
+'''
+
+
+class PatientComputedField(BaseModel):
+    name: str = Field(..., description="Name of the patient", example="John Doe")
+    weight: float = Field(..., gt=0, lt=300, description="Weight must be greater than 0 and less than 300", example=70.5) # in kg
+    height: float = Field(..., gt=0, lt=3, description="Height must be greater than 0 and less than 3", example=1.75) # in meters
+
+    @computed_field
+    @property
+    def bmi(self) -> float:
+        bmi = round(self.weight/(self.height**2),2)
+        return bmi
+    
+
+# lets test the computed field
+patient_computed_field_info= {"name":"Zubrist", "weight":75.6, "height":1.8}
+patient_computed_field= PatientComputedField(**patient_computed_field_info)    
+print(f"Patient BMI: {patient_computed_field.bmi}")
+
+
+
+'''
+NESTED MODELS
+
+what ? -> we can have a model inside another model 
+
+how ? -> we can define a model as a field in another model
+
+why ? -> this is useful for representing complex data structures
+'''
+
+class Address(BaseModel):
+    street: str = Field(..., description="Street address", example="123 Main St")
+    city: str = Field(..., description="City", example="Anytown")
+    state: str = Field(..., description="State", example="CA")
+    zip_code: str = Field(..., description="ZIP code", example="12345")
+
+class PatientNestedModel(BaseModel):
+    name: str = Field(..., description="Name of the patient", example="John Doe")
+    age: int = Field(..., gt=0, lt=120, description="Age must be between 0 and 120", example=30)
+    address: Address  # nested model
+
+# creating object of Address pydantic model
+address_info= {"street":"123 Main St", "city":"Anytown", "state":"CA", "zip_code":"12345"}
+addressX= Address(**address_info)
+
+# creating object of PatientNestedModel pydantic model
+patient_info= {"name":"John Doe", "age":30, "address": addressX}
+patient= PatientNestedModel(**patient_info)
+
+print(patient)
+print(patient.address.city)  # accessing nested model field
+print(patient.address.zip_code)  # accessing nested model field
+
+
+
+
+'''
+Serialization of pydantic models
+
+'''
+
+type1 =patient.model_dump() # returns a dictionary
+print(type(type1))
+print(type1)
+
+
+type2= patient.model_dump_json() # returns a json string
+print(type(type2))
+print(type2)
+
+# pydantic aslo give controls of what to include/exclude in the serialization
+type3= patient.model_dump(include={'name','age'}) # include only name and age
+print(type3)
+
+type4= patient.model_dump(exclude={'age'}) # exclude age
+print(type4)
